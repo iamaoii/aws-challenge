@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Community Events</title>
+    <title>Login - ClikiTayo</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 
@@ -42,32 +42,7 @@
 
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
-    <script>
-        // Redirect if already authenticated
-        if (isAuthenticated()) {
-            window.location.href = 'dashboard.html';
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(e.target);
-            const credentials = {
-                email: formData.get('email'),
-                password: formData.get('password')
-            };
-
-            await handleFormSubmit(e.target, async () => {
-                const response = await authAPI.login(credentials);
-                setToken(response.access_token);
-                showAlert('Login successful!', 'success');
-
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            });
-        });
-    </script>
+    <script src="../js/login.js"></script>
 </body>
 
 </html>
