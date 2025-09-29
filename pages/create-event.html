@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event - Community Events</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="dashboard.html" class="nav-brand">Community Events</a>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Home</a></li>
+                <li><a href="my-events.html">My Events</a></li>
+                <li><a href="create-event.html">Create Event</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>Create New Event</h1>
+                <p>Organize a community event and bring people together</p>
+            </div>
+
+            <div class="form-container create-event-form">
+                <form id="createEventForm">
+                    <div class="form-group">
+                        <label for="title">Event Title *</label>
+                        <input 
+                            type="text" 
+                            id="title" 
+                            name="title" 
+                            required 
+                            placeholder="Enter a compelling event title"
+                            maxlength="100"
+                        >
+                        <small class="form-help">Make it descriptive and engaging</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Event Description *</label>
+                        <textarea 
+                            id="description" 
+                            name="description" 
+                            required 
+                            placeholder="Describe your event, what to expect, and why people should attend..."
+                            rows="5"
+                            maxlength="1000"
+                        ></textarea>
+                        <small class="form-help">Provide details about activities, requirements, and what attendees should bring</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date">Event Date *</label>
+                            <input 
+                                type="date" 
+                                id="date" 
+                                name="date" 
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="time">Event Time *</label>
+                            <input 
+                                type="time" 
+                                id="time" 
+                                name="time" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location *</label>
+                        <input 
+                            type="text" 
+                            id="location" 
+                            name="location" 
+                            required 
+                            placeholder="Enter the event location or address"
+                            maxlength="200"
+                        >
+                        <small class="form-help">Be specific so attendees can easily find the venue</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" name="category">
+                                <option value="">Select a category</option>
+                                <option value="community">Community Service</option>
+                                <option value="social">Social Gathering</option>
+                                <option value="educational">Educational</option>
+                                <option value="sports">Sports & Recreation</option>
+                                <option value="arts">Arts & Culture</option>
+                                <option value="business">Business & Networking</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maxAttendees">Max Attendees</label>
+                            <input 
+                                type="number" 
+                                id="maxAttendees" 
+                                name="maxAttendees" 
+                                min="1" 
+                                max="10000"
+                                placeholder="Leave empty for unlimited"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="requirements">Special Requirements</label>
+                        <textarea 
+                            id="requirements" 
+                            name="requirements" 
+                            placeholder="Any special requirements, age restrictions, items to bring, etc."
+                            rows="3"
+                            maxlength="500"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactInfo">Contact Information</label>
+                        <input 
+                            type="text" 
+                            id="contactInfo" 
+                            name="contactInfo" 
+                            placeholder="Phone number or email for questions"
+                            maxlength="100"
+                        >
+                        <small class="form-help">Optional: Provide contact info for attendee questions</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Create Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+             Event Preview 
+            <div class="event-preview" id="eventPreview" style="display: none;">
+                <h3>Event Preview</h3>
+                <div class="card">
+                    <div class="card-title" id="previewTitle">Event Title</div>
+                    <div class="card-meta">
+                        <div id="previewDateTime">📅 Date & Time</div>
+                        <div id="previewLocation">📍 Location</div>
+                        <div id="previewCategory">🏷️ Category</div>
+                    </div>
+                    <div class="card-description" id="previewDescription">
+                        Event description will appear here...
+                    </div>
+                    <div id="previewRequirements" style="display: none;">
+                        <strong>Requirements:</strong>
+                        <p id="previewRequirementsText"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Ensure user is authenticated
+        requireAuth();
+        updateAuthUI();
+
+        // Set minimum date to today
+        document.getElementById('date').min = new Date().toISOString().split('T')[0];
+
+        // Form validation and preview
+        const form = document.getElementById('createEventForm');
+        const previewSection = document.getElementById('eventPreview');
+
+        // Real-time preview updates
+        const titleInput = document.getElementById('title');
+        const descriptionInput = document.getElementById('description');
+        const dateInput = document.getElementById('date');
+        const timeInput = document.getElementById('time');
+        const locationInput = document.getElementById('location');
+        const categoryInput = document.getElementById('category');
+        const requirementsInput = document.getElementById('requirements');
+
+        // Update preview when inputs change
+        [titleInput, descriptionInput, dateInput, timeInput, locationInput, categoryInput, requirementsInput].forEach(input => {
+            input.addEventListener('input', updatePreview);
+        });
+
+        function updatePreview() {
+            const title = titleInput.value.trim();
+            const description = descriptionInput.value.trim();
+            const date = dateInput.value;
+            const time = timeInput.value;
+            const location = locationInput.value.trim();
+            const category = categoryInput.value;
+            const requirements = requirementsInput.value.trim();
+
+            // Show preview only if we have basic info
+            if (title || description || date || location) {
+                previewSection.style.display = 'block';
+
+                // Update preview content
+                document.getElementById('previewTitle').textContent = title || 'Event Title';
+                document.getElementById('previewDescription').textContent = description || 'Event description will appear here...';
+                
+                // Format date and time
+                let dateTimeText = '📅 ';
+                if (date && time) {
+                    const eventDate = new Date(date + 'T' + time);
+                    dateTimeText += eventDate.toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    }) + ' at ' + eventDate.toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+                } else if (date) {
+                    dateTimeText += new Date(date).toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                } else {
+                    dateTimeText += 'Date & Time';
+                }
+                document.getElementById('previewDateTime').textContent = dateTimeText;
+
+                document.getElementById('previewLocation').textContent = '📍 ' + (location || 'Location');
+                document.getElementById('previewCategory').textContent = '🏷️ ' + (category ? getCategoryName(category) : 'Category');
+
+                // Show/hide requirements
+                const requirementsDiv = document.getElementById('previewRequirements');
+                if (requirements) {
+                    requirementsDiv.style.display = 'block';
+                    document.getElementById('previewRequirementsText').textContent = requirements;
+                } else {
+                    requirementsDiv.style.display = 'none';
+                }
+            } else {
+                previewSection.style.display = 'none';
+            }
+        }
+
+        function getCategoryName(value) {
+            const categories = {
+                'community': 'Community Service',
+                'social': 'Social Gathering',
+                'educational': 'Educational',
+                'sports': 'Sports & Recreation',
+                'arts': 'Arts & Culture',
+                'business': 'Business & Networking',
+                'other': 'Other'
+            };
+            return categories[value] || value;
+        }
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            // Combine date and time
+            const date = formData.get('date');
+            const time = formData.get('time');
+            const dateTime = new Date(date + 'T' + time).toISOString();
+            
+            const eventData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                date: dateTime,
+                location: formData.get('location'),
+                category: formData.get('category') || null,
+                max_attendees: formData.get('maxAttendees') ? parseInt(formData.get('maxAttendees')) : null,
+                requirements: formData.get('requirements') || null,
+                contact_info: formData.get('contactInfo') || null
+            };
+            
+            await handleFormSubmit(e.target, async () => {
+                await eventsAPI.create(eventData);
+                showAlert('Event created successfully!', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'my-events.html';
+                }, 1500);
+            });
+        });
+
+        // Character counters
+        function addCharacterCounter(inputId, maxLength) {
+            const input = document.getElementById(inputId);
+            const counter = document.createElement('small');
+            counter.className = 'character-counter';
+            counter.style.float = 'right';
+            counter.style.color = '#6b7280';
+            
+            function updateCounter() {
+                const remaining = maxLength - input.value.length;
+                counter.textContent = `${remaining} characters remaining`;
+                counter.style.color = remaining < 20 ? '#dc2626' : '#6b7280';
+            }
+            
+            input.addEventListener('input', updateCounter);
+            input.parentNode.appendChild(counter);
+            updateCounter();
+        }
+
+        // Add character counters
+        addCharacterCounter('title', 100);
+        addCharacterCounter('description', 1000);
+        addCharacterCounter('requirements', 500);
+    </script>
+</body>
+</html>

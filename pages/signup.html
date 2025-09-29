@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Community Events</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="se-form-title">Sign Up</h1>
+
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary se-form-button-full">
+                    Sign Up
+                </button>
+            </form>
+
+            <p class="se-form-footer">
+                Already have an account?
+                <a href="login.html" class="se-form-link">Login</a>
+            </p>
+
+            <p class="se-form-footer se-form-footer-top">
+                <a href="../index.html" class="se-form-link">← Back to Home</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Redirect if already authenticated
+        if (isAuthenticated()) {
+            window.location.href = 'dashboard.html';
+        }
+
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match!', 'error');
+                return;
+            }
+
+            const userData = {
+                full_name: formData.get('fullName'),
+                email: formData.get('email'),
+                password: password
+            };
+
+            await handleFormSubmit(e.target, async () => {
+                await authAPI.signup(userData);
+                showAlert('Account created successfully! Please login.', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>

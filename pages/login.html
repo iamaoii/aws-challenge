@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Community Events</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="se-form-title">Login</h1>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary se-form-button-full">
+                    Login
+                </button>
+            </form>
+
+            <p class="se-form-footer">
+                Don't have an account?
+                <a href="signup.html" class="se-form-link">Sign up</a>
+            </p>
+
+            <p class="se-form-footer se-form-footer-top">
+                <a href="../index.html" class="se-form-link">← Back to Home</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Redirect if already authenticated
+        if (isAuthenticated()) {
+            window.location.href = 'dashboard.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const credentials = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            await handleFormSubmit(e.target, async () => {
+                const response = await authAPI.login(credentials);
+                setToken(response.access_token);
+                showAlert('Login successful!', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+
+</html>
