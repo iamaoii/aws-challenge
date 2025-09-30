@@ -1,12 +1,12 @@
 let registeredEvents = [];
 let createdEvents = [];
-let currentTab = 'registered';
+let currentTab = "registered";
 
 function setupMyEvents() {
   requireAuth();
   updateAuthUI();
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     loadRegisteredEvents();
     loadCreatedEvents();
   });
@@ -14,106 +14,102 @@ function setupMyEvents() {
 
 function switchTab(tabName) {
   currentTab = tabName;
-  
-  document.querySelectorAll('.tab-button').forEach(btn => {
-    btn.classList.remove('active');
+
+  document.querySelectorAll(".tab-button").forEach((btn) => {
+    btn.classList.remove("active");
   });
-  document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
-  
-  document.querySelectorAll('.tab-content').forEach(content => {
-    content.classList.remove('active');
+  document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add("active");
+
+  document.querySelectorAll(".tab-content").forEach((content) => {
+    content.classList.remove("active");
   });
-  document.getElementById(tabName + 'Tab').classList.add('active');
+  document.getElementById(tabName + "Tab").classList.add("active");
 }
 
 async function loadRegisteredEvents() {
-  const loadingSpinner = document.getElementById('registeredLoadingSpinner');
-  const eventsContainer = document.getElementById('registeredEventsContainer');
-  const noEvents = document.getElementById('noRegisteredEvents');
+  const loadingSpinner = document.getElementById("registeredLoadingSpinner");
+  const eventsContainer = document.getElementById("registeredEventsContainer");
+  const noEvents = document.getElementById("noRegisteredEvents");
 
   try {
-    loadingSpinner.style.display = 'block';
-    eventsContainer.style.display = 'none';
-    noEvents.style.display = 'none';
+    loadingSpinner.style.display = "block";
+    eventsContainer.style.display = "none";
+    noEvents.style.display = "none";
 
     const user = getCurrentUser();
     const events = await usersAPI.getMyEvents(user.id);
-    registeredEvents = events;
+    registeredEvents = events.registered;
 
-    if (events.length === 0) {
-      loadingSpinner.style.display = 'none';
-      noEvents.style.display = 'block';
+    if (registeredEvents.length === 0) {
+      loadingSpinner.style.display = "none";
+      noEvents.style.display = "block";
       return;
     }
 
-    renderRegisteredEvents(events);
-    loadingSpinner.style.display = 'none';
-    eventsContainer.style.display = 'grid';
+    renderRegisteredEvents(registeredEvents);
+    loadingSpinner.style.display = "none";
+    eventsContainer.style.display = "grid";
   } catch (error) {
-    loadingSpinner.style.display = 'none';
-    showAlert('Failed to load registered events: ' + error.message, 'error');
+    loadingSpinner.style.display = "none";
+    showAlert("Failed to load registered events: " + error.message, "error");
   }
 }
 
 async function loadCreatedEvents() {
-  const loadingSpinner = document.getElementById('createdLoadingSpinner');
-  const eventsContainer = document.getElementById('createdEventsContainer');
-  const noEvents = document.getElementById('noCreatedEvents');
+  const loadingSpinner = document.getElementById("createdLoadingSpinner");
+  const eventsContainer = document.getElementById("createdEventsContainer");
+  const noEvents = document.getElementById("noCreatedEvents");
 
   try {
-    loadingSpinner.style.display = 'block';
-    eventsContainer.style.display = 'none';
-    noEvents.style.display = 'none';
+    loadingSpinner.style.display = "block";
+    eventsContainer.style.display = "none";
+    noEvents.style.display = "none";
 
     const user = getCurrentUser();
-    const events = await usersAPI.getMyEvents(user.id); // Assuming same endpoint for created events
-    createdEvents = events;
+    const events = await usersAPI.getMyEvents(user.id);
+    createdEvents = events.created;
 
-    if (events.length === 0) {
-      loadingSpinner.style.display = 'none';
-      noEvents.style.display = 'block';
+    if (createdEvents.length === 0) {
+      loadingSpinner.style.display = "none";
+      noEvents.style.display = "block";
       return;
     }
 
-    renderCreatedEvents(events);
-    loadingSpinner.style.display = 'none';
-    eventsContainer.style.display = 'grid';
+    renderCreatedEvents(createdEvents);
+    loadingSpinner.style.display = "none";
+    eventsContainer.style.display = "grid";
   } catch (error) {
-    loadingSpinner.style.display = 'none';
-    showAlert('Failed to load created events: ' + error.message, 'error');
+    loadingSpinner.style.display = "none";
+    showAlert("Failed to load created events: " + error.message, "error");
   }
 }
 
 function renderRegisteredEvents(events) {
-  const container = document.getElementById('registeredEventsContainer');
-  container.innerHTML = '';
+  const container = document.getElementById("registeredEventsContainer");
+  container.innerHTML = "";
 
-  events.forEach(event => {
+  events.forEach((event) => {
     const eventCard = createRegisteredEventCard(event);
     container.appendChild(eventCard);
   });
 }
 
 function renderCreatedEvents(events) {
-  const container = document.getElementById('createdEventsContainer');
-  container.innerHTML = '';
+  const container = document.getElementById("createdEventsContainer");
+  container.innerHTML = "";
 
-  events.forEach(event => {
+  events.forEach((event) => {
     const eventCard = createCreatedEventCard(event);
     container.appendChild(eventCard);
   });
 }
 
 function createRegisteredEventCard(event) {
-  const card = document.createElement('div');
-  card.className = 'card';
+  const card = document.createElement("div");
+  card.className = "card";
 
   const eventDate = formatEventDate(event.date);
-  const eventTime = new Date(event.date).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
+  const eventTime = event.time;
   const isPastEvent = new Date(event.date) < new Date();
 
   card.innerHTML = `
@@ -124,14 +120,14 @@ function createRegisteredEventCard(event) {
       ${isPastEvent ? '<div class="event-status past">Past Event</div>' : '<div class="event-status upcoming">Upcoming</div>'}
     </div>
     <div class="card-description">
-      ${escapeHtml(event.description)}
+      ${escapeHtml(event.description || "")}
     </div>
     <div class="card-actions">
       ${!isPastEvent ? `
-        <button class="btn btn-danger" onclick="cancelRegistration(${event.id})">
+        <button class="btn btn-danger" onclick="cancelRegistration('${event.id}')">
           Cancel Registration
         </button>
-      ` : ''}
+      ` : ""}
     </div>
   `;
 
@@ -139,15 +135,11 @@ function createRegisteredEventCard(event) {
 }
 
 function createCreatedEventCard(event) {
-  const card = document.createElement('div');
-  card.className = 'card';
+  const card = document.createElement("div");
+  card.className = "card";
 
   const eventDate = formatEventDate(event.date);
-  const eventTime = new Date(event.date).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
+  const eventTime = event.time;
   const isPastEvent = new Date(event.date) < new Date();
 
   card.innerHTML = `
@@ -159,17 +151,17 @@ function createCreatedEventCard(event) {
       ${isPastEvent ? '<div class="event-status past">Past Event</div>' : '<div class="event-status upcoming">Upcoming</div>'}
     </div>
     <div class="card-description">
-      ${escapeHtml(event.description)}
+      ${escapeHtml(event.description || "")}
     </div>
     <div class="card-actions">
-      <button class="btn btn-secondary" onclick="viewEventDetails(${event.id})">
+      <button class="btn btn-secondary" onclick="viewEventDetails('${event.id}')">
         View Details
       </button>
       ${!isPastEvent ? `
-        <button class="btn btn-primary" onclick="editEvent(${event.id})">
+        <button class="btn btn-primary" onclick="editEvent('${event.id}')">
           Edit Event
         </button>
-      ` : ''}
+      ` : ""}
     </div>
   `;
 
@@ -177,40 +169,40 @@ function createCreatedEventCard(event) {
 }
 
 async function cancelRegistration(eventId) {
-  if (!confirm('Are you sure you want to cancel your registration for this event?')) {
+  if (!confirm("Are you sure you want to cancel your registration for this event?")) {
     return;
   }
 
   try {
     await eventsAPI.unregister(eventId);
-    showAlert('Registration cancelled successfully!', 'success');
+    showAlert("Registration cancelled successfully!", "success");
     loadRegisteredEvents();
   } catch (error) {
-    showAlert('Failed to cancel registration: ' + error.message, 'error');
+    showAlert("Failed to cancel registration: " + error.message, "error");
   }
 }
 
 function filterRegisteredEvents() {
-  const filter = document.getElementById('statusFilter').value;
+  const filter = document.getElementById("statusFilter").value;
   const now = new Date();
 
   let filteredEvents = registeredEvents;
 
-  if (filter === 'upcoming') {
-    filteredEvents = registeredEvents.filter(event => new Date(event.date) >= now);
-  } else if (filter === 'past') {
-    filteredEvents = registeredEvents.filter(event => new Date(event.date) < now);
+  if (filter === "upcoming") {
+    filteredEvents = registeredEvents.filter((event) => new Date(event.date) >= now);
+  } else if (filter === "past") {
+    filteredEvents = registeredEvents.filter((event) => new Date(event.date) < now);
   }
 
   renderRegisteredEvents(filteredEvents);
 }
 
 function viewEventDetails(eventId) {
-  showAlert('Event details view coming soon!', 'info');
+  showAlert("Event details view coming soon!", "info");
 }
 
 function editEvent(eventId) {
-  showAlert('Event editing coming soon!', 'info');
+  showAlert("Event editing coming soon!", "info");
 }
 
 // Initialize my-events page
