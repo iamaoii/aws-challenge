@@ -1,24 +1,20 @@
-// API configuration
-const API_BASE_URL = "http://localhost:8000/api";
+const API_BASE_URL = "http://localhost:8000/api"; // Update if backend is on another IP
 
-// Get auth token from localStorage
 function getToken() {
   return localStorage.getItem("auth_token");
 }
 
-// Set auth token in localStorage
 function setToken(token) {
   localStorage.setItem("auth_token", token);
 }
 
-// Remove auth token from localStorage
 function removeToken() {
   localStorage.removeItem("auth_token");
 }
 
-// Generic API request function
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
+  console.log("Requesting:", url);
   const token = getToken();
 
   const config = {
@@ -29,7 +25,6 @@ async function apiRequest(endpoint, options = {}) {
     ...options,
   };
 
-  // Add Authorization header if token exists
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -49,7 +44,6 @@ async function apiRequest(endpoint, options = {}) {
   }
 }
 
-// Authentication API calls
 const authAPI = {
   async signup(userData) {
     return apiRequest("/auth/signup", {
@@ -70,7 +64,6 @@ const authAPI = {
   },
 };
 
-// Events API calls
 const eventsAPI = {
   async getAll() {
     return apiRequest("/events");
@@ -96,7 +89,6 @@ const eventsAPI = {
   },
 };
 
-// Users API calls
 const usersAPI = {
   async getMyEvents(userId) {
     return apiRequest(`/events/users/${userId}/events`);

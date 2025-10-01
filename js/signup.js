@@ -20,6 +20,7 @@ function setupSignupForm() {
       email: formData.get("email"),
       password: password,
     };
+    const response = await authAPI.signup(userData);
 
     await handleFormSubmit(e.target, async () => {
       const response = await authAPI.signup(userData);
