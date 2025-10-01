@@ -1,0 +1,102 @@
+# Python-specific ignores
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+*.whl
+*.tar.gz
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+env.bak/
+venv.bak/
+
+# Environment variables and sensitive files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+secrets/
+*.key
+*.pem
+
+# FastAPI/Supabase-specific ignores
+*.log
+logs/
+*.pid
+*.seed
+supabase.env
+
+# JavaScript/Node.js-specific ignores
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+dist/
+build/
+coverage/
+*.log
+*.log.*
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+.DS_Store
+
+# OS-specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Testing and coverage
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+.pytest_cache/
+.tox/
+.nox/
+*.lcov
+
+# Miscellaneous
+*.bak
+*.swp
+*~
+*.tmp
+temp/
+tmp/
+
+# Project-specific ignores (if any)
+# Add any specific temporary or sensitive files unique to your project
+database.json
+*.sqlite3
+*.db
+
+# Include essential files explicitly (optional, for clarity)
+!backend/main.py
+!backend/app/api/auth.py
+!backend/app/api/events.py
+!backend/app/core/config.py
+!backend/app/db/supabase.py
+!backend/requirements.txt
+!js/api.js
+!js/signup.js
+!js/requests.js
+!js/traffic.js
+!pages/signup.html
+!pages/dashboard.html
